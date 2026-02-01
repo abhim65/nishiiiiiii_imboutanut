@@ -4,70 +4,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For Nishi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
     <style>
-        /* This section makes the page look pretty */
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #fae1dd; /* Light pink background */
-            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); /* Clean subtle gradient */
+            background-color: #ffe6e6; /* Fallback */
+            font-family: 'Nunito', sans-serif;
             margin: 0;
-            overflow: hidden; /* Stops scrollbars from appearing when button moves */
-        }
-
-        .container {
-            text-align: center;
+            overflow: hidden;
             position: relative;
         }
 
+        /* Floating Hearts Background Animation */
+        .heart-bg {
+            position: absolute;
+            color: #ff99ac;
+            top: -1vh;
+            font-size: 1.5rem;
+            animation: fall linear forwards;
+            z-index: -1; /* Behind everything */
+            opacity: 0.6;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(105vh);
+            }
+        }
+
+        /* The main card styling */
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 400px;
+            position: relative;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
         .gif-container img {
-            width: 200px;
+            width: 100%;
+            max-width: 220px;
             height: auto;
-            border-radius: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         h1 {
-            color: #d32f2f;
-            font-size: 2.5rem;
-            margin: 20px 0;
+            color: #ff4d6d;
+            font-family: 'Pacifico', cursive; /* Cute cursive font */
+            font-size: 2.2rem;
+            margin: 25px 0;
+            line-height: 1.2;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
             margin-top: 20px;
+            min-height: 50px; /* Reserves space so layout doesn't jump */
         }
 
         button {
-            font-size: 1.2rem;
-            padding: 10px 20px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            padding: 12px 30px;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             cursor: pointer;
-            margin: 0 10px;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         #yesBtn {
-            background-color: #ff4081; /* Pink button */
+            background: linear-gradient(45deg, #ff5e62, #ff9966);
             color: white;
-            font-weight: bold;
+            font-weight: 800;
         }
 
         #yesBtn:hover {
-            background-color: #f50057;
-            transform: scale(1.1);
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(255, 77, 109, 0.4);
         }
 
         #noBtn {
-            background-color: #e0e0e0;
-            color: black;
-            position: absolute; /* Allows us to move it anywhere */
-        }
-        
-        /* This hides the "No" button text initially to prevent jumping layout */
-        .hidden {
-            display: none;
+            background-color: #f1f1f1;
+            color: #333;
+            font-weight: 700;
+            position: absolute; /* Needed for movement */
         }
     </style>
 </head>
@@ -82,7 +120,7 @@
 
         <div class="btn-container">
             <button id="yesBtn">Yes</button>
-            <button id="noBtn" title="No seems a bit shy">No</button>
+            <button id="noBtn">No</button>
         </div>
     </div>
 
@@ -91,33 +129,57 @@
         const noBtn = document.getElementById('noBtn');
         const question = document.getElementById('question');
         const mainGif = document.getElementById('mainGif');
-        const btnContainer = document.querySelector('.btn-container');
 
-        // Logic to make the "No" button run away
+        // --- BACKGROUND HEARTS GENERATOR ---
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-bg');
+            heart.innerHTML = '❤️';
+            
+            // Randomize position and animation speed
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's'; // 2-5 seconds
+            heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+            
+            document.body.appendChild(heart);
+            
+            // Remove heart after animation
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+        }
+        
+        // Create a new heart every 300 milliseconds
+        setInterval(createHeart, 300);
+
+        // --- BUTTON RUNAWAY LOGIC ---
+        // We handle the "No" button movement here
         noBtn.addEventListener('mouseover', () => {
             const wrapper = document.body;
             const wrapperRect = wrapper.getBoundingClientRect();
             const noBtnRect = noBtn.getBoundingClientRect();
 
-            // Calculate random positions within the screen
-            const i = Math.floor(Math.random() * (wrapperRect.width - noBtnRect.width)) + 1;
-            const j = Math.floor(Math.random() * (wrapperRect.height - noBtnRect.height)) + 1;
+            // Calculate random position
+            const i = Math.floor(Math.random() * (wrapperRect.width - noBtnRect.width));
+            const j = Math.floor(Math.random() * (wrapperRect.height - noBtnRect.height));
 
             noBtn.style.left = i + 'px';
             noBtn.style.top = j + 'px';
         });
 
-        // Logic for clicking "Yes"
+        // --- SUCCESS LOGIC ---
         yesBtn.addEventListener('click', () => {
-            // 1. Change the text
-            question.innerHTML = "YAY! 🎉 See you soon!";
-            
-            // 2. Change the GIF to a happy/celebration one
+            question.innerHTML = "YAY! 🎉 See you soon Nishi!";
             mainGif.src = "https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif";
             
-            // 3. Hide the buttons
+            // Hide buttons
             yesBtn.style.display = 'none';
             noBtn.style.display = 'none';
+
+            // Create massive confetti explosion
+            for(let i=0; i<100; i++) {
+                createHeart();
+            }
         });
     </script>
 </body>
